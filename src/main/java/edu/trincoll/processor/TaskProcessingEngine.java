@@ -15,33 +15,33 @@ public class TaskProcessingEngine {
     public List<Task> processPipeline(
             List<Task> tasks,
             List<Function<List<Task>, List<Task>>> operations) {
-        // Implementation needed
-        return null;
+        List<Task> result = tasks;
+        for (Function<List<Task>, List<Task>> op : operations) {
+            result = op.apply(result);
+        }
+        return result;
     }
 
     // TODO: Implement using Supplier for lazy evaluation
     public Task getOrCreateDefault(Optional<Task> taskOpt, Supplier<Task> defaultSupplier) {
-        // Implementation needed
-        return null;
+        return taskOpt.orElseGet(defaultSupplier);
     }
 
     // TODO: Implement using Consumer for side effects
     public void processTasksWithSideEffects(
             List<Task> tasks,
             Consumer<Task> sideEffect) {
-        // Implementation needed
+        tasks.forEach(sideEffect);
     }
 
     // TODO: Implement using BiFunction
     public Task mergeTasks(Task task1, Task task2, BiFunction<Task, Task, Task> merger) {
-        // Implementation needed
-        return null;
+        return merger.apply(task1, task2);
     }
 
     // TODO: Implement using UnaryOperator
     public List<Task> transformAll(List<Task> tasks, UnaryOperator<Task> transformer) {
-        // Implementation needed
-        return null;
+        return tasks.stream().map(transformer).toList();
     }
 
     // TODO: Implement using custom functional interfaces
@@ -49,8 +49,10 @@ public class TaskProcessingEngine {
             List<Task> tasks,
             TaskPredicate filter,
             TaskTransformer transformer) {
-        // Implementation needed
-        return null;
+        return tasks.stream()
+                .filter(filter)
+                .map(transformer)
+                .toList();
     }
 
     // TODO: Implement batch processing with TaskProcessor
@@ -58,26 +60,34 @@ public class TaskProcessingEngine {
             List<Task> tasks,
             int batchSize,
             TaskProcessor processor) {
-        // Implementation needed
+        for (int i = 0; i < tasks.size(); i += batchSize) {
+            int end = Math.min(i + batchSize, tasks.size());
+            processor.process(tasks.subList(i, end));
+        }
     }
 
     // TODO: Implement Optional chaining
     public Optional<String> getHighestPriorityTaskTitle(List<Task> tasks) {
-        // Implementation needed
-        return Optional.empty();
+        return tasks.stream()
+                .max(Comparator.comparingInt(t -> t.priority().getWeight()))
+                .map(Task::title);
     }
 
     // TODO: Implement stream generation using Stream.generate
     public Stream<Task> generateTaskStream(Supplier<Task> taskSupplier) {
-        // Implementation needed
-        return Stream.empty();
+        return Stream.generate(taskSupplier);
     }
 
     // TODO: Implement using Comparator composition
     public List<Task> sortByMultipleCriteria(
             List<Task> tasks,
             List<Comparator<Task>> comparators) {
-        // Implementation needed
-        return null;
+        Comparator<Task> combined = comparators.stream()
+                .reduce(Comparator::thenComparing)
+                .orElse((a, b) -> 0);
+
+        return tasks.stream()
+                .sorted(combined)
+                .toList();
     }
 }
